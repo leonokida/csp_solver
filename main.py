@@ -8,6 +8,30 @@ class t_restricao(Enum):
     V = 0,
     I = 1
 
+# Recebe: indice de uma variavel e solucao parcial
+# Retorna: boolean dizendo se a variavel esta na solucao parcial
+def esta_na_solucao(var, solucao):
+    for elem in solucao:
+        if elem['var'] == var:
+            return True
+    return False
+
+# Recebe: indice de uma variavel e solucao parcial
+# Retorna: valor da variavel na solucao parcial
+def obtem_valor_na_solucao(var, solucao):
+    for elem in solucao:
+        if elem['var'] == var:
+            return elem['valor']
+        
+# Recebe: indice e valor de uma variavel, lista de restricoes
+# Retorna: lista de restricoes que possuem a variavel com o valor especificado
+def busca_rest(indice, valor, lista):
+    retorno_lista = []
+    for i in lista:
+        if i[indice] == valor:
+            retorno_lista.append(i)
+    return retorno_lista
+
 # Recebe: indice i da variavel sendo buscada e lista de variaveis
 # Retorna: dados da variavel i na lista
 def busca_var(indice: int, lista_vars: list):
@@ -24,13 +48,54 @@ def csp_solver(indice: int, num_vars: int, lista_vars: list, num_restricoes: int
     
     # obtem dominio da variavel
     dados_var = busca_var(indice, lista_vars)
-    dom_valido = copy.deepcopy(dados_var['dominio'])
+
+    # lista de restricoes relevantes
+    valores_validos = set(copy.deepcopy(dados_var['dominio']))
 
     # remove valores invalidos do dominio
-    # a implementar
+    for rest in lista_restricoes:
+        # testa se a variavel esta na restricao, se sim: obtem indice correspondente dentro do escopo
+        if indice in rest['indices_escopo']:
+            posicao_escopo = rest['indices_escopo'].index(indice)
+            # analisa outras variaveis
+            outras_vars = copy.deepcopy(rest['indices_escopo'])
+            outras_vars.remove(indice)
 
-    if dom_valido == []:
-        return False
+            for outra_var in outras_vars:
+                # se a outra variavel ja esta na solucao, o valor da variavel atual eh condicional
+                # obtem valor e indice na tupla da outra variavel
+                valor_na_solucao = obtem_valor_na_solucao(outra_var, solucao)
+                indice_outra_var = rest['indices_escopo'].index(outra_var)
+
+                if esta_na_solucao(outra_var, solucao):
+                    if rest['tipo_restricao'] == t_restricao.V:
+                        # conjunto de valores a serem inseridos no dominio valido
+                        novos_valores = set()
+                        # busca restricoes que possuem a outra variavel com o valor atual
+                        for t in busca_rest(indice_outra_var, valor_na_solucao, rest['tuplas']):
+                            # se for restricao valida, adiciona aos novos valores
+                            if rest['tipo_restricao'] == t_restricao.V:
+                                novos_valores.add(t[posicao_escopo])
+
+                        # atualiza valores validos com interseccao para nao afetar valores antigos   
+                        valores_validos = valores_validos.intersection(novos_valores)
+
+                    else:
+                        for t in busca_rest(indice_outra_var, valor_na_solucao, rest['tuplas']):
+                            if t[posicao_escopo] in valores_validos:
+                                # remove valores invalidos do dominio
+                                valores_validos.remove(t[posicao_escopo])
+
+                # se a outra variavel ainda nao esta na solucao, o valor da variavel atual nao esta condicionada a ela
+                else:
+                    novos_valores = copy.deepcopy(valores_validos)
+                    for t in rest['tuplas']:
+                        novos_valores.add(t[posicao_escopo])
+                    # atualiza valores validos com interseccao para nao afetar valores antigos
+                    valores_validos = valores_validos.intersection(novos_valores)
+
+    # gera dominio valido
+    dom_valido = list(valores_validos)
 
     # testa valores do dominio na solucao
     for valor in dom_valido:
