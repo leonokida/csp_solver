@@ -73,7 +73,7 @@ def csp_solver(indice: int, num_vars: int, lista_vars: list, num_restricoes: int
                         novos_valores = set()
                         # busca restricoes que possuem a outra variavel com o valor atual
                         for t in busca_rest(indice_outra_var, valor_na_solucao, rest['tuplas']):
-                            # se for restricao valida, adiciona aos novos valores                            
+                            # se for restricao valida, adiciona aos novos valores
                             novos_valores.add(t[posicao_escopo])
 
                         # atualiza valores validos com interseccao para nao afetar valores antigos   
@@ -88,8 +88,16 @@ def csp_solver(indice: int, num_vars: int, lista_vars: list, num_restricoes: int
                 # se a outra variavel ainda nao esta na solucao, o valor da variavel atual nao esta condicionada a ela
                 else:
                     novos_valores = copy.deepcopy(valores_validos)
-                    for t in rest['tuplas']:
-                        novos_valores.add(t[posicao_escopo])
+                    if rest['tipo_restricao'] == t_restricao.V:
+                        for t in rest['tuplas']:
+                            # novos_valores = set()
+                            novos_valores.add(t[posicao_escopo])
+                    # else:
+                    #     for t in rest['tuplas']:
+                    #         if t[posicao_escopo] in novos_valores:
+                    #             # remove valores invalidos do dominio
+                    #             novos_valores.remove(t[posicao_escopo])
+                    # print(novos_valores)
                     # atualiza valores validos com interseccao para nao afetar valores antigos
                     valores_validos = valores_validos.intersection(novos_valores)
 
