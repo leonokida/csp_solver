@@ -252,7 +252,7 @@ if __name__ == "__main__":
                 print(i['nome_var'] + " = " + str(i['valor']))      
         elif args.eh_sat:
             with open("tmp.out", 'w') as file:
-                file.write("NAO_SAT")  
+                file.write("SAT")  
         else:
             print("Erro: escreva -v ou -s para a saida", file=sys.stderr)
             sys.exit(1)
@@ -261,7 +261,7 @@ if __name__ == "__main__":
             print("INVALIDO")
         elif args.eh_sat:
             with open("tmp.out", 'w') as file:
-                file.write("SAT")
+                file.write("NAO_SAT")
         else:
             print("Erro: escreva -v ou -s para a saida", file=sys.stderr)
             sys.exit(1)
