@@ -100,7 +100,6 @@ def traduz_dimacs(dimacs_file, output_file):
             # Escreve tuplas validas
             file.write(f"{len(tuplas_validas)} {' '.join(tuplas_validas)}\n")
 
-
 if __name__ == "__main__":
     dimacs_file = sys.argv[1]  # Caminho para o arquivo DIMACS
     output_file = sys.argv[2]  # Caminho para o arquivo de saída CNF

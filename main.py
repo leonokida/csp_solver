@@ -3,6 +3,8 @@
 from enum import Enum
 import sys
 import copy
+import dimacs_translation
+import argparse
 
 class t_restricao(Enum):
     V = 0,
@@ -196,11 +198,70 @@ def le_entrada(nome_arq: str):
 
     return (num_vars, lista_vars, num_restricoes, lista_restricoes)
 
-# Obtem as listas de variaveis e de restricoes
-n_vars, vars, n_rest, rest = le_entrada(sys.argv[1])
-solucao = []
-if csp_solver(1, n_vars, vars, n_rest, rest, solucao):
-    for i in solucao:
-        print(i['nome_var'] + " = " + str(i['valor']))
-else:
-    print("INVALIDO")
+if __name__ == "__main__":
+
+    # Lida com opcoes e argumentos
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument('-d', '--dimacs', action='store_true',
+                        help="O input eh um arquivo .dimacs")  
+    parser.add_argument('-r', '--restricoes', action='store_true',
+                        help="O input esta no formato de restricoes criado")  
+    parser.add_argument('-s', '--eh_sat', action='store_true',
+                        help="O output dira se eh sat ou nao")  
+    parser.add_argument('-v', '--valores', action='store_true',
+                        help="O output sera os valores encontrados para as variaveis")  
+    parser.add_argument('filename')  
+
+    args = parser.parse_args()
+
+    # Checa entrada
+    arquivo_entrada = args.filename
+
+    # Se arquivo for .DIMACS
+    if args.dimacs:
+        nome_arquivo = arquivo_entrada.split(".")
+
+        if nome_arquivo[-1] == 'dimacs':
+            # Converte para o formato de restricoes
+            saida_txt = f'{nome_arquivo[0]}.txt'
+            dimacs_translation.traduz_dimacs(arquivo_entrada, saida_txt)
+
+            # Faz a leitura das restricoes
+            n_vars, vars, n_rest, rest = le_entrada(saida_txt)
+        
+        else:
+            print("Erro: a flag -d deve vir com um arquivo .DIMACS", file=sys.stderr)
+            sys.exit(1)
+
+    # Se o arquivo for restricoes .txt, faz a leitura
+    elif args.restricoes:
+        nome_arquivo = arquivo_entrada.split(".")
+
+        if nome_arquivo[-1] == 'txt':
+            n_vars, vars, n_rest, rest = le_entrada(arquivo_entrada)
+        else:
+            print("Erro: a flag -r deve vir com um arquivo .txt", file=sys.stderr)
+            sys.exit(1)
+
+    # Checa a saida
+    solucao = []
+    if csp_solver(1, n_vars, vars, n_rest, rest, solucao):
+        if args.valores:
+            for i in solucao:
+                print(i['nome_var'] + " = " + str(i['valor']))      
+        elif args.eh_sat:
+            with open("tmp.out", 'w') as file:
+                file.write("NAO_SAT")  
+        else:
+            print("Erro: escreva -v ou -s para a saida", file=sys.stderr)
+            sys.exit(1)
+    else:
+        if args.valores:           
+            print("INVALIDO")
+        elif args.eh_sat:
+            with open("tmp.out", 'w') as file:
+                file.write("SAT")
+        else:
+            print("Erro: escreva -v ou -s para a saida", file=sys.stderr)
+            sys.exit(1)
