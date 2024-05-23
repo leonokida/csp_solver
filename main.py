@@ -203,8 +203,8 @@ if __name__ == "__main__":
     # Lida com opcoes e argumentos
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('-d', '--dimacs', action='store_true',
-                        help="O input eh um arquivo .dimacs")  
+    parser.add_argument('-c', '--cnf', action='store_true',
+                        help="O input eh um arquivo .dimacs ou .cnf")  
     parser.add_argument('-r', '--restricoes', action='store_true',
                         help="O input esta no formato de restricoes criado")  
     parser.add_argument('-s', '--eh_sat', action='store_true',
@@ -218,20 +218,36 @@ if __name__ == "__main__":
     # Checa entrada
     arquivo_entrada = args.filename
 
-    # Se arquivo for .DIMACS
-    if args.dimacs:
+    # Se ha duas flags de entrada
+    if args.restricoes and args.cnf:
+        print("Erro: Inclua somente uma flag de entrada, -c ou -r", file=sys.stderr)
+        sys.exit(1)
+    # Se ha duas flags de saida
+    elif args.valores and args.eh_sat:
+        print("Erro: Inclua somente uma flag de saida, -s ou -v", file=sys.stderr)
+        sys.exit(1)
+    # Se nao ha flag de saida
+    elif not args.valores and not args.eh_sat:
+        print("Erro: Inclua uma flag de saida, -s ou -v", file=sys.stderr)
+        sys.exit(1)
+    # Se nao ha flag de entrada
+    elif not args.restricoes and not args.cnf:
+        print("Erro: Inclua uma flag de entrada, -c ou -r", file=sys.stderr)
+        sys.exit(1)
+    # Se arquivo for .DIMACS ou .cnf
+    elif args.cnf:
         nome_arquivo = arquivo_entrada.split(".")
 
-        if nome_arquivo[-1] == 'dimacs':
+        if nome_arquivo[-1] == 'dimacs' or nome_arquivo[-1] == 'cnf':
             # Converte para o formato de restricoes
-            saida_txt = f'{nome_arquivo[0]}.txt'
-            dimacs_translation.traduz_dimacs(arquivo_entrada, saida_txt)
+            saida_traducao = 'tmp.out'
+            dimacs_translation.traduz_dimacs(arquivo_entrada, saida_traducao)
 
-            # Faz a leitura das restricoes
-            n_vars, vars, n_rest, rest = le_entrada(saida_txt)
+            # Faz a leitura das variaveis e restricoes
+            n_vars, vars, n_rest, rest = le_entrada(saida_traducao)
         
         else:
-            print("Erro: a flag -d deve vir com um arquivo .DIMACS", file=sys.stderr)
+            print("Erro: a flag -c deve vir com um arquivo .cnf ou .DIMACS", file=sys.stderr)
             sys.exit(1)
 
     # Se o arquivo for restricoes .txt, faz a leitura
@@ -239,29 +255,39 @@ if __name__ == "__main__":
         nome_arquivo = arquivo_entrada.split(".")
 
         if nome_arquivo[-1] == 'txt':
+            # Faz a leitura das variaveis e restricoes
             n_vars, vars, n_rest, rest = le_entrada(arquivo_entrada)
         else:
             print("Erro: a flag -r deve vir com um arquivo .txt", file=sys.stderr)
             sys.exit(1)
 
-    # Checa a saida
+
+    # Roda o solver
+    
     solucao = []
+
+    # Se achou solucao
     if csp_solver(1, n_vars, vars, n_rest, rest, solucao):
+        # Se a saida for os valores das variaveis
         if args.valores:
             for i in solucao:
                 print(i['nome_var'] + " = " + str(i['valor']))      
+        # Se a saida for sat ou nao sat
         elif args.eh_sat:
             with open("tmp.out", 'w') as file:
                 file.write("SAT")  
         else:
             print("Erro: escreva -v ou -s para a saida", file=sys.stderr)
             sys.exit(1)
+    # Se nao achou solucao
     else:
+        # Se a saida for os valores das variaveis
         if args.valores:           
             print("INVALIDO")
+        # Se a saida for sat ou nao sat    
         elif args.eh_sat:
             with open("tmp.out", 'w') as file:
-                file.write("NAO_SAT")
+                file.write("UNSAT")
         else:
             print("Erro: escreva -v ou -s para a saida", file=sys.stderr)
             sys.exit(1)

@@ -1,4 +1,5 @@
 import sys
+import argparse
 
 # Le a entrada
 def parse_dimacs(dimacs_file):
@@ -71,6 +72,7 @@ def encontra_tuplas(clausula):
 
 # Traduz DIMACS para o formato requisitado
 def traduz_dimacs(dimacs_file, output_file):
+
     n_vars, n_clausulas, variaveis, clausulas = parse_dimacs(dimacs_file)
     dominio = gera_dominio(variaveis)
     
@@ -101,7 +103,27 @@ def traduz_dimacs(dimacs_file, output_file):
             file.write(f"{len(tuplas_validas)} {' '.join(tuplas_validas)}\n")
 
 if __name__ == "__main__":
-    dimacs_file = sys.argv[1]  # Caminho para o arquivo DIMACS
-    output_file = sys.argv[2]  # Caminho para o arquivo de saída CNF
-    traduz_dimacs(dimacs_file, output_file)
 
+    # Lida com opcoes e argumentos
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument('file_in', help="O input eh um arquivo .dimacs ou .cnf")  
+    parser.add_argument('file_out', help="O output eh um arquivo de texto") 
+
+    args = parser.parse_args()
+
+    # Se arquivo for .DIMACS ou .cnf
+    if args.file_in and args.file_out:
+        arquivo_entrada = args.file_in
+        nome_arquivo = arquivo_entrada.split(".")
+        saida_traducao = args.file_out
+
+        if nome_arquivo[-1] == 'dimacs' or nome_arquivo[-1] == 'cnf':
+            # Converte para o formato de restricoes
+            traduz_dimacs(arquivo_entrada, saida_traducao)
+        
+        else:
+            print("Erro: a entrada eh um arquivo .cnf ou .DIMACS", file=sys.stderr)
+            sys.exit(1)
+
+ 

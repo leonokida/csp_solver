@@ -66,7 +66,8 @@ int ASK(Clausula alfa, BaseCon *BC) {
 
   // chama o SAT solver
   char comando[100];
-  sprintf(comando, "python %s -d -s %s %s > /dev/null 2> /dev/null", SAT_SOLVER, ARQ_IN, ARQ_OUT);
+  sprintf(comando, "python %s -c -s %s", SAT_SOLVER, ARQ_IN);
+  printf("vou rodar o %s \n", comando);
   if (system(comando) == -1) {
     printf("ERRO ao executar SAT Solver com comando %s\n", comando);
     exit(-1);
@@ -77,5 +78,6 @@ int ASK(Clausula alfa, BaseCon *BC) {
   char res[30];
   fscanf(f, "%s", res);
   fclose(f);
+  printf("%s\n",res);
   return strcmp(res, "SAT"); // retorna 0 se for SAT, isto é, não é consequência lógica
 }
