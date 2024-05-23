@@ -67,7 +67,6 @@ int ASK(Clausula alfa, BaseCon *BC) {
   // chama o SAT solver
   char comando[100];
   sprintf(comando, "python %s -c -s %s", SAT_SOLVER, ARQ_IN);
-  printf("vou rodar o %s \n", comando);
   if (system(comando) == -1) {
     printf("ERRO ao executar SAT Solver com comando %s\n", comando);
     exit(-1);
