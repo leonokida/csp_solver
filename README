@@ -18,7 +18,7 @@ Além disso, permite especificar o tipo de saída desejada.
 
 Sintaxe
 
-usage: main.py [-h] [-c] [-r] [-s] [-v] filename
+usage: main.py [-h] [-c] [-r] [-s] [-v] [-d] filename
 
 Argumentos Posicionais
 
@@ -31,6 +31,8 @@ Flags
     -r, --restricoes: Indica que o input está no formato de restrições criado.
     -s, --eh_sat: O output indicará se o problema é satisfatível ou não (SAT ou UNSAT).
     -v, --valores: O output será os valores encontrados para as variáveis.
+    -d, --debug: Coloca prints de debug
+
 
 Regras de Uso
 

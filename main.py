@@ -41,11 +41,11 @@ def busca_var(indice: int, lista_vars: list):
         if var['indice_var'] == indice:
             return var
 
-# Recebe: indice da variavel que tem valor atribuido, numero e lista de variaveis, numero e lista de restricoes, lista para armazenar solucao
-# Retorna: se csp eh ou nao valido
 def csp_solver(indice: int, num_vars: int, lista_vars: list, num_restricoes: int, lista_restricoes: list, solucao: list):
     # retorna se solucao eh valida
     if indice == num_vars + 1:
+        if DEBUG:
+            print(f"\nSolucao encontrada: {solucao}\n")
         return True
     
     # obtem dominio da variavel
@@ -53,6 +53,9 @@ def csp_solver(indice: int, num_vars: int, lista_vars: list, num_restricoes: int
 
     # lista de restricoes relevantes
     valores_validos = set(copy.deepcopy(dados_var['dominio']))
+
+    # if DEBUG:
+    #     print(f"Valores válidos antes de remover inválidos para var {indice}: {valores_validos}")
 
     # remove valores invalidos do dominio
     for rest in lista_restricoes:
@@ -78,6 +81,9 @@ def csp_solver(indice: int, num_vars: int, lista_vars: list, num_restricoes: int
                             # se for restricao valida, adiciona aos novos valores                            
                             novos_valores.add(t[posicao_escopo])
 
+                        if DEBUG:
+                            print(f"Novos valores para var {indice} com outra var {outra_var}: {novos_valores}")
+
                         # atualiza valores validos com interseccao para nao afetar valores antigos   
                         valores_validos = valores_validos.intersection(novos_valores)
 
@@ -100,6 +106,10 @@ def csp_solver(indice: int, num_vars: int, lista_vars: list, num_restricoes: int
 
     # testa valores do dominio na solucao
     for valor in dom_valido:
+
+        if DEBUG:
+            print(f"Tentando valor {valor} para var {dados_var['nome_var']} na solução {solucao}")
+
         solucao.append({
             'nome_var': dados_var['nome_var'],
             'var': indice,
@@ -107,11 +117,7 @@ def csp_solver(indice: int, num_vars: int, lista_vars: list, num_restricoes: int
         })
         if csp_solver(indice + 1, num_vars, lista_vars, num_restricoes, lista_restricoes, solucao):
             return True
-        solucao.remove({
-            'nome_var': dados_var['nome_var'],
-            'var': indice,
-            'valor': valor
-        })
+        solucao.pop()  
 
     # nao possui solucao valida
     return False
@@ -179,10 +185,11 @@ def le_entrada(nome_arq: str):
         valores_tupla = linha.split(' ')
         num_tuplas = int(valores_tupla[0])
         tuplas = list()
+
         for ind_tupla in range(1, len(valores_tupla), tam_escopo):
             tupla = list()
-            for i in range(0, tam_escopo):
-                tupla.append(int(valores_tupla[ind_tupla+i]))
+            for j in range(0, tam_escopo):
+                tupla.append(int(valores_tupla[ind_tupla+j]))
             tuplas.append(tupla)
         
         # adiciona na lista de restricoes
@@ -211,9 +218,17 @@ if __name__ == "__main__":
                         help="O output dira se eh sat ou nao")  
     parser.add_argument('-v', '--valores', action='store_true',
                         help="O output sera os valores encontrados para as variaveis")  
+    parser.add_argument('-d', '--debug', action='store_true',
+                    help="Coloca prints de debug")  
     parser.add_argument('filename')  
 
     args = parser.parse_args()
+
+    # Prints para debugar
+    if args.debug:
+        DEBUG = True
+    else:
+        DEBUG = False
 
     # Checa entrada
     arquivo_entrada = args.filename
@@ -261,6 +276,17 @@ if __name__ == "__main__":
             print("Erro: a flag -r deve vir com um arquivo .txt", file=sys.stderr)
             sys.exit(1)
 
+    if DEBUG:
+
+        print(f"Variaveis:")
+        for i in range(len(vars)):
+            print(vars[i])            
+        
+        print(f"\nRestricoes:")
+        for i in range(len(rest)):
+            print(rest[i])
+
+        print(f"\n")
 
     # Roda o solver
     
