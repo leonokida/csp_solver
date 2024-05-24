@@ -61,13 +61,46 @@ def csp_solver(indice: int, num_vars: int, lista_vars: list, num_restricoes: int
     for rest in lista_restricoes:
         # testa se a variavel esta na restricao, se sim: obtem indice correspondente dentro do escopo
         if indice in rest['indices_escopo']:
+
             posicao_escopo = rest['indices_escopo'].index(indice)
+            
+            # para variavel 1
+            if indice == 1:
+                if DEBUG:
+                    print(f"Valores antigos para var {indice}: {valores_validos}")
+
+                novos_valores = set()
+
+                if len(solucao) == 0:   
+                    for tupla in rest['tuplas']:
+                        
+                        if tupla[0] == 1:
+                            novos_valores.add(1)
+                        elif tupla[0] == -1: 
+                            novos_valores.add(0)                       
+                else: 
+                    valor_na_solucao = obtem_valor_na_solucao(indice, solucao)             
+
+                    # busca restricoes que possuem a outra variavel com o valor atual
+                    for t in busca_rest(indice, valor_na_solucao, rest['tuplas']):
+                        # se for restricao valida, adiciona aos novos valores                            
+                        novos_valores.add(t[posicao_escopo])
+
+                if DEBUG:
+                    print(f"Novos_valores para var {indice}: {valores_validos.intersection(novos_valores)}")
+
+                # atualiza valores validos com interseccao para nao afetar valores antigos   
+                valores_validos = valores_validos.intersection(novos_valores)
+
+                if DEBUG:
+                    print(f"Valores atualizados para var {indice}: {valores_validos}")
+
             # analisa outras variaveis
             outras_vars = copy.deepcopy(rest['indices_escopo'])
-            outras_vars.remove(indice)
+            outras_vars.remove(indice)         
 
+            # se a outra vaiavel ja esta na solucao, o valor da variavel atual eh condicional
             for outra_var in outras_vars:
-                # se a outra variavel ja esta na solucao, o valor da variavel atual eh condicional
                 # obtem valor e indice na tupla da outra variavel
                 valor_na_solucao = obtem_valor_na_solucao(outra_var, solucao)
                 indice_outra_var = rest['indices_escopo'].index(outra_var)
