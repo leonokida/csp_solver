@@ -73,7 +73,7 @@ def csp_solver(indice: int, num_vars: int, lista_vars: list, num_restricoes: int
 
                 if len(solucao) == 0:   
                     for tupla in rest['tuplas']:
-                        
+
                         if tupla[0] == 1:
                             novos_valores.add(1)
                         elif tupla[0] == -1: 
@@ -87,7 +87,7 @@ def csp_solver(indice: int, num_vars: int, lista_vars: list, num_restricoes: int
                         novos_valores.add(t[posicao_escopo])
 
                 if DEBUG:
-                    print(f"Novos_valores para var {indice}: {valores_validos.intersection(novos_valores)}")
+                    print(f"Novos_valores para var {indice}: {novos_valores}")
 
                 # atualiza valores validos com interseccao para nao afetar valores antigos   
                 valores_validos = valores_validos.intersection(novos_valores)
