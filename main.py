@@ -65,74 +65,91 @@ def csp_solver(indice: int, num_vars: int, lista_vars: list, num_restricoes: int
             posicao_escopo = rest['indices_escopo'].index(indice)
             
             # para variavel 1
-            if indice == 1:
-                if DEBUG:
-                    print(f"Valores antigos para var {indice}: {valores_validos}")
+            # if indice == 1:
+            #     if DEBUG:
+            #         print(f"Valores antigos para var {indice}: {valores_validos}")
 
-                novos_valores = set()
+            #     novos_valores = set()
 
-                if len(solucao) == 0:   
-                    for tupla in rest['tuplas']:
+            #     if len(solucao) == 0:   
+            #         for tupla in rest['tuplas']:
 
-                        if tupla[0] == 1:
-                            novos_valores.add(1)
-                        elif tupla[0] == -1: 
-                            novos_valores.add(0)                       
-                else: 
-                    valor_na_solucao = obtem_valor_na_solucao(indice, solucao)             
+            #             if tupla[0] == 1:
+            #                 novos_valores.add(1)
+            #             elif tupla[0] == -1: 
+            #                 novos_valores.add(0)                       
+            #     else: 
+            #         valor_na_solucao = obtem_valor_na_solucao(indice, solucao)             
 
-                    # busca restricoes que possuem a outra variavel com o valor atual
-                    for t in busca_rest(indice, valor_na_solucao, rest['tuplas']):
-                        # se for restricao valida, adiciona aos novos valores                            
-                        novos_valores.add(t[posicao_escopo])
+            #         # busca restricoes que possuem a outra variavel com o valor atual
+            #         for t in busca_rest(indice, valor_na_solucao, rest['tuplas']):
+            #             # se for restricao valida, adiciona aos novos valores                            
+            #             novos_valores.add(t[posicao_escopo])
 
-                if DEBUG:
-                    print(f"Novos_valores para var {indice}: {novos_valores}")
+            #     if DEBUG:
+            #         print(f"Novos_valores para var {indice}: {novos_valores}")
 
-                # atualiza valores validos com interseccao para nao afetar valores antigos   
-                valores_validos = valores_validos.intersection(novos_valores)
+            #     # atualiza valores validos com interseccao para nao afetar valores antigos   
+            #     valores_validos = valores_validos.intersection(novos_valores)
 
-                if DEBUG:
-                    print(f"Valores atualizados para var {indice}: {valores_validos}")
+            #     if DEBUG:
+            #         print(f"Valores atualizados para var {indice}: {valores_validos}")
 
             # analisa outras variaveis
             outras_vars = copy.deepcopy(rest['indices_escopo'])
             outras_vars.remove(indice)         
 
-            # se a outra vaiavel ja esta na solucao, o valor da variavel atual eh condicional
-            for outra_var in outras_vars:
-                # obtem valor e indice na tupla da outra variavel
-                valor_na_solucao = obtem_valor_na_solucao(outra_var, solucao)
-                indice_outra_var = rest['indices_escopo'].index(outra_var)
-
-                if esta_na_solucao(outra_var, solucao):
-                    if rest['tipo_restricao'] == t_restricao.V:
-                        # conjunto de valores a serem inseridos no dominio valido
-                        novos_valores = set()
-                        # busca restricoes que possuem a outra variavel com o valor atual
-                        for t in busca_rest(indice_outra_var, valor_na_solucao, rest['tuplas']):
-                            # se for restricao valida, adiciona aos novos valores                            
-                            novos_valores.add(t[posicao_escopo])
-
-                        if DEBUG:
-                            print(f"Novos valores para var {indice} com outra var {outra_var}: {novos_valores}")
-
-                        # atualiza valores validos com interseccao para nao afetar valores antigos   
-                        valores_validos = valores_validos.intersection(novos_valores)
-
-                    else:
-                        for t in busca_rest(indice_outra_var, valor_na_solucao, rest['tuplas']):
-                            if t[posicao_escopo] in valores_validos:
-                                # remove valores invalidos do dominio
-                                valores_validos.remove(t[posicao_escopo])
-
-                # se a outra variavel ainda nao esta na solucao, o valor da variavel atual nao esta condicionada a ela
-                else:
-                    novos_valores = copy.deepcopy(valores_validos)
+            # tratamento quando a restrição possui apenas 1 variável
+            if (outras_vars == []):
+                if rest['tipo_restricao'] == t_restricao.V:
+                    novos_valores = set()
                     for t in rest['tuplas']:
                         novos_valores.add(t[posicao_escopo])
                     # atualiza valores validos com interseccao para nao afetar valores antigos
                     valores_validos = valores_validos.intersection(novos_valores)
+                    
+                else:
+                    for t in busca_rest(indice_outra_var, valor_na_solucao, rest['tuplas']):
+                        if t[posicao_escopo] in valores_validos:
+                            # remove valores invalidos do dominio
+                            valores_validos.remove(t[posicao_escopo])
+            
+            # tratamento quando a restrição possui múltiplas variáveis
+            else:
+                # se a outra vaiavel ja esta na solucao, o valor da variavel atual eh condicional
+                for outra_var in outras_vars:
+                    # obtem valor e indice na tupla da outra variavel
+                    valor_na_solucao = obtem_valor_na_solucao(outra_var, solucao)
+                    indice_outra_var = rest['indices_escopo'].index(outra_var)
+
+                    if esta_na_solucao(outra_var, solucao):
+                        if rest['tipo_restricao'] == t_restricao.V:
+                            # conjunto de valores a serem inseridos no dominio valido
+                            novos_valores = set()
+                            # busca restricoes que possuem a outra variavel com o valor atual
+                            for t in busca_rest(indice_outra_var, valor_na_solucao, rest['tuplas']):
+                                # se for restricao valida, adiciona aos novos valores                            
+                                novos_valores.add(t[posicao_escopo])
+
+                            if DEBUG:
+                                print(f"Novos valores para var {indice} com outra var {outra_var}: {novos_valores}")
+
+                            # atualiza valores validos com interseccao para nao afetar valores antigos   
+                            valores_validos = valores_validos.intersection(novos_valores)
+
+                        else:
+                            for t in busca_rest(indice_outra_var, valor_na_solucao, rest['tuplas']):
+                                if t[posicao_escopo] in valores_validos:
+                                    # remove valores invalidos do dominio
+                                    valores_validos.remove(t[posicao_escopo])
+
+                    # se a outra variavel ainda nao esta na solucao, o valor da variavel atual nao esta condicionada a ela
+                    else:
+                        novos_valores = set()
+                        for t in rest['tuplas']:
+                            novos_valores.add(t[posicao_escopo])
+                        # atualiza valores validos com interseccao para nao afetar valores antigos
+                        valores_validos = valores_validos.intersection(novos_valores)
 
     # gera dominio valido
     dom_valido = list(valores_validos)
