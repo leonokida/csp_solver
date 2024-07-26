@@ -5,14 +5,16 @@ import sys
 import copy
 import dimacs_translation
 import argparse
-import copy
 
 class t_restricao(Enum):
     V = 0,
     I = 1
     
 def revisa(rest, var, lista_vars):
-    return
+    outras_vars = copy.deepcopy(rest['indices_escopo'])
+    outras_vars.remove(var)
+
+    return var['dominio']
 
 # Coloca consistência de arco nas restrições
 def ac3(num_vars: int, lista_vars: list, num_restricoes: int, lista_restricoes: list):
@@ -20,22 +22,25 @@ def ac3(num_vars: int, lista_vars: list, num_restricoes: int, lista_restricoes: 
 
     # Empilha restrições
     for rest in lista_restricoes:
-        for i in rest['indices_escopo']:
-            stack.append((rest, copy.deepcopy(i)))
+        for var in rest['indices_escopo']:
+            stack.append((rest, var))
 
     while stack != []:
 
         # Revisa restrição no topo da pilha
         rest, var = stack.pop()
-        nova_var = revisa(rest, var, lista_vars)
+        novo_dom = revisa(rest, var, lista_vars)
+        alteracao = False
 
+        # Aplica revisão
         for i in lista_vars:
-            if i['indice_var'] == nova_var['indice_var']:
-                i = nova_var
+            if i['indice_var'] == var and i['dominio'] != novo_dom:
+                i['dominio'] = novo_dom
+                alteracao = True
                 break
 
         # Adiciona restrições que podem ter sido afetadas pela revisão
-        if nova_var != var:
+        if alteracao:
             for rest2  in lista_restricoes:
                 if var in rest2['indices_escopo'] and rest2 != rest:
                     for var2 in rest2['indices_escopo']:
@@ -81,6 +86,9 @@ def csp_solver(indice: int, num_vars: int, lista_vars: list, num_restricoes: int
         if DEBUG:
             print(f"\nSolucao encontrada: {solucao}\n")
         return True
+    
+    # aplica consistência de arco ac-3
+    lista_vars = ac3(num_vars, lista_vars, num_restricoes, lista_restricoes)
     
     # obtem dominio da variavel
     dados_var = busca_var(indice, lista_vars)
