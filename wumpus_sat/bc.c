@@ -77,6 +77,6 @@ int ASK(Clausula alfa, BaseCon *BC) {
   char res[30];
   fscanf(f, "%s", res);
   fclose(f);
-  printf("%s\n",res);
+  // printf("%s\n",res);
   return strcmp(res, "SAT"); // retorna 0 se for SAT, isto é, não é consequência lógica
 }

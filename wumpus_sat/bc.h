@@ -21,7 +21,7 @@
 #define MAX_LIT 5      // no máximo 5 literais por cláusula
 
 // #define SAT_SOLVER "./minisat"   // comandos do SAT solver
-#define SAT_SOLVER "../main.py"
+#define SAT_SOLVER "../csp_solver/main.py"
 #define ARQ_IN     "tmp.cnf"
 #define ARQ_OUT    "tmp.out"
 
