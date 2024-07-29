@@ -40,16 +40,39 @@ def busca_var(indice: int, lista_vars: list):
     for var in lista_vars:
         if var['indice_var'] == indice:
             return var
+        
+def busca_mrv(lista_vars: list):
 
-def csp_solver(indice: int, num_vars: int, lista_vars: list, num_restricoes: int, lista_restricoes: list, solucao: list):
-    # retorna se solucao eh valida
-    if indice == num_vars + 1:
-        if DEBUG:
-            print(f"\nSolucao encontrada: {solucao}\n")
-        return True
+    menor_dominio = float('inf')
+    var_escolhida = None
+
+    for i in range(len(lista_vars)):
+        var = lista_vars[i]
+        dom = len(var['dominio'])        
+
+        if dom < menor_dominio and var['escolhida'] == 0:
+            # print(f"antes {var['escolhida']}")
+            menor_dominio = dom
+            var_escolhida = var
+            var['escolhida'] = 1
+            # print(f"depois {var['escolhida']}") 
+            lista_vars[i] = var
+           
+    return lista_vars, var_escolhida
+
+def csp_solver(num_vars: int, lista_vars: list, num_restricoes: int, lista_restricoes: list, solucao: list):
     
     # obtem dominio da variavel
-    dados_var = busca_var(indice, lista_vars)
+    lista_vars, dados_var = busca_mrv(lista_vars)
+    
+    # todas as variaveis ja foram escolhidas
+    if dados_var == None:
+        if DEBUG:
+            print(f"\nSolucao encontrada: {solucao}\n")
+        return True    
+
+    # pega indice da variavel
+    indice = dados_var['indice_var']
 
     # lista de restricoes relevantes
     valores_validos = set(copy.deepcopy(dados_var['dominio']))
@@ -124,14 +147,14 @@ def csp_solver(indice: int, num_vars: int, lista_vars: list, num_restricoes: int
     for valor in dom_valido:
 
         if DEBUG:
-            print(f"Tentando valor {valor} para var {dados_var['nome_var']} na solução {solucao}")
+            print(f"Tentando valor {valor} para var {dados_var['nome_var']} na solução")
 
         solucao.append({
             'nome_var': dados_var['nome_var'],
             'var': indice,
             'valor': valor
         })
-        if csp_solver(indice + 1, num_vars, lista_vars, num_restricoes, lista_restricoes, solucao):
+        if csp_solver(num_vars, lista_vars, num_restricoes, lista_restricoes, solucao):
             return True
         solucao.pop()  
 
@@ -170,7 +193,8 @@ def le_entrada(nome_arq: str):
             'indice_var': i,
             'nome_var': nome_var,
             'tam_dominio': tam_dominio_var,
-            'dominio': dominio
+            'dominio': dominio,
+            'escolhida': 0
         })
     
     # obtem numero de restricoes
@@ -221,7 +245,7 @@ def le_entrada(nome_arq: str):
 
     return (num_vars, lista_vars, num_restricoes, lista_restricoes)
 
-if __name__ == "__main__":
+def le_argumentos():
 
     # Lida com opcoes e argumentos
     parser = argparse.ArgumentParser()
@@ -293,7 +317,6 @@ if __name__ == "__main__":
             sys.exit(1)
 
     if DEBUG:
-
         print(f"Variaveis:")
         for i in range(len(vars)):
             print(vars[i])            
@@ -304,16 +327,23 @@ if __name__ == "__main__":
 
         print(f"\n")
 
-    # Roda o solver
+    return (n_vars, vars, n_rest, rest, args)
+
+if __name__ == "__main__":
+
+    n_vars, vars, n_rest, rest, args = le_argumentos()
+    DEBUG = args.debug
     
+    # Roda o solver    
     solucao = []
 
     # Se achou solucao
-    if csp_solver(1, n_vars, vars, n_rest, rest, solucao):
+    if csp_solver(n_vars, vars, n_rest, rest, solucao):
         # Se a saida for os valores das variaveis
         if args.valores:
             for i in solucao:
-                print(i['nome_var'] + " = " + str(i['valor']))      
+                print(i['nome_var'] + " = " + str(i['valor']))   
+                # print('\n')   
         # Se a saida for sat ou nao sat
         elif args.eh_sat:
             with open("tmp.out", 'w') as file:
