@@ -9,6 +9,89 @@ import argparse
 class t_restricao(Enum):
     V = 0,
     I = 1
+    
+def revisa(rest, var, lista_vars):
+    dominio = busca_var(var, lista_vars)['dominio']
+    posicao_escopo = rest['indices_escopo'].index(var)
+
+    # verifica valores que não respeitam restrição
+    remover = []
+
+    # restrições do tipo válido
+    if rest['tipo_restricao'] == t_restricao.V:
+        for valor in dominio:
+            eh_valido = False
+
+            for tupla in rest["tuplas"]:
+                # se o valor estiver registrado na restrição, ele pode ser válido
+                if valor == tupla[posicao_escopo]:
+                    relacionado_invalido = False
+
+                    # se o valor estiver relacionado a um valor que não existe no domínio de outra variável, ele é inválido
+                    for posicao_outra_var, valor_outra_var in enumerate(tupla):
+                        if posicao_outra_var != posicao_escopo and not (valor_outra_var in busca_var(rest['indices_escopo'][posicao_outra_var], lista_vars)['dominio']):
+                            relacionado_invalido = True
+
+                    if not relacionado_invalido:
+                        eh_valido = True
+                        break
+
+            if not eh_valido:
+                remover.append(valor)
+
+    # restrições do tipo inválido
+    elif rest['tipo_restricao'] == t_restricao.I:
+        for valor in dominio:
+            eh_valido = True
+            # remove o valor do domínio se ele for relacionado a outra variável que só possui o valor restrito no domínio
+            for tupla in rest["tuplas"]:
+                if valor == tupla[posicao_escopo]:
+                    for posicao_outra_var, valor_outra_var in enumerate(tupla):
+                        if posicao_outra_var != posicao_escopo and [valor_outra_var] == busca_var(rest['indices_escopo'][posicao_outra_var], lista_vars)['dominio']:
+                            eh_valido = False
+                            break
+
+        if not eh_valido:
+            remover.append(valor)
+
+    # remove valores do domínio que não estão de acordo com restrição
+    for valor in remover:
+        dominio.remove(valor)
+
+    return dominio
+
+# Coloca consistência de arco nas restrições
+def ac3(num_vars: int, lista_vars: list, num_restricoes: int, lista_restricoes: list):
+    stack = []
+
+    # Empilha restrições
+    for rest in lista_restricoes:
+        for var in rest['indices_escopo']:
+            stack.append((rest, var))
+
+    while stack != []:
+
+        # Revisa restrição no topo da pilha
+        rest, var = stack.pop()
+        novo_dom = revisa(rest, var, lista_vars)
+        alteracao = False
+
+        # Aplica revisão
+        for i in lista_vars:
+            if i['indice_var'] == var and i['dominio'] != novo_dom:
+                i['dominio'] = novo_dom
+                alteracao = True
+                break
+
+        # Adiciona restrições que podem ter sido afetadas pela revisão
+        if alteracao:
+            for rest2 in lista_restricoes:
+                if var in rest2['indices_escopo'] and rest2 != rest:
+                    for var2 in rest2['indices_escopo']:
+                        if var2 != var:
+                            stack.append((rest2, var2))
+
+    return lista_vars
 
 # Recebe: indice de uma variavel e solucao parcial
 # Retorna: boolean dizendo se a variavel esta na solucao parcial
@@ -40,45 +123,25 @@ def busca_var(indice: int, lista_vars: list):
     for var in lista_vars:
         if var['indice_var'] == indice:
             return var
-        
-def busca_mrv(lista_vars: list):
 
-    menor_dominio = float('inf')
-    var_escolhida = None
-
-    for i in range(len(lista_vars)):
-        var = lista_vars[i]
-        dom = len(var['dominio'])        
-
-        if dom < menor_dominio and var['escolhida'] == 0:
-            # print(f"antes {var['escolhida']}")
-            menor_dominio = dom
-            var_escolhida = var
-            var['escolhida'] = 1
-            # print(f"depois {var['escolhida']}") 
-            lista_vars[i] = var
-        
-           
-    return lista_vars, var_escolhida
-
-def csp_solver(num_vars: int, lista_vars: list, num_restricoes: int, lista_restricoes: list, solucao: list):
-    
-    # obtem dominio da variavel
-    lista_vars, dados_var = busca_mrv(lista_vars)
-    
-    # todas as variaveis ja foram escolhidas
-    if dados_var == None:
+def csp_solver(indice: int, num_vars: int, lista_vars: list, num_restricoes: int, lista_restricoes: list, solucao: list):
+    # retorna se solucao eh valida
+    if indice == num_vars + 1:
         if DEBUG:
             print(f"\nSolucao encontrada: {solucao}\n")
-        return True    
+        return True
     
-    # print(f"var {dados_var['indice_var']}, {dados_var['dominio']}, {dados_var['escolhida']}")
-
-    # pega indice da variavel
-    indice = dados_var['indice_var']
+    # aplica consistência de arco ac-3
+    lista_vars = ac3(num_vars, lista_vars, num_restricoes, lista_restricoes)
+    
+    # obtem dominio da variavel
+    dados_var = busca_var(indice, lista_vars)
 
     # lista de restricoes relevantes
     valores_validos = set(copy.deepcopy(dados_var['dominio']))
+
+    # if DEBUG:
+    #     print(f"Valores válidos antes de remover inválidos para var {indice}: {valores_validos}")
 
     # remove valores invalidos do dominio
     for rest in lista_restricoes:
@@ -106,7 +169,7 @@ def csp_solver(num_vars: int, lista_vars: list, num_restricoes: int, lista_restr
                             # remove valores invalidos do dominio
                             valores_validos.remove(t[posicao_escopo])
             
-            # tratamento quando a restrição possui multiplas variáveis
+            # tratamento quando a restrição possui múltiplas variáveis
             else:
                 # se a outra vaiavel ja esta na solucao, o valor da variavel atual eh condicional
                 for outra_var in outras_vars:
@@ -145,21 +208,19 @@ def csp_solver(num_vars: int, lista_vars: list, num_restricoes: int, lista_restr
 
     # gera dominio valido
     dom_valido = list(valores_validos)
-    # print(f'len dom valido {len(dom_valido)}')
 
     # testa valores do dominio na solucao
     for valor in dom_valido:
 
         if DEBUG:
-            print(f"Tentando valor {valor} para var {dados_var['nome_var']} na solução")
+            print(f"Tentando valor {valor} para var {dados_var['nome_var']} na solução {solucao}")
 
         solucao.append({
             'nome_var': dados_var['nome_var'],
             'var': indice,
             'valor': valor
         })
-        
-        if csp_solver(num_vars, lista_vars, num_restricoes, lista_restricoes, solucao):
+        if csp_solver(indice + 1, num_vars, lista_vars, num_restricoes, lista_restricoes, solucao):
             return True
         solucao.pop()  
 
@@ -198,8 +259,7 @@ def le_entrada(nome_arq: str):
             'indice_var': i,
             'nome_var': nome_var,
             'tam_dominio': tam_dominio_var,
-            'dominio': dominio,
-            'escolhida': 0
+            'dominio': dominio
         })
     
     # obtem numero de restricoes
@@ -250,7 +310,7 @@ def le_entrada(nome_arq: str):
 
     return (num_vars, lista_vars, num_restricoes, lista_restricoes)
 
-def le_argumentos():
+if __name__ == "__main__":
 
     # Lida com opcoes e argumentos
     parser = argparse.ArgumentParser()
@@ -322,6 +382,7 @@ def le_argumentos():
             sys.exit(1)
 
     if DEBUG:
+
         print(f"Variaveis:")
         for i in range(len(vars)):
             print(vars[i])            
@@ -332,23 +393,16 @@ def le_argumentos():
 
         print(f"\n")
 
-    return (n_vars, vars, n_rest, rest, args)
-
-if __name__ == "__main__":
-
-    n_vars, vars, n_rest, rest, args = le_argumentos()
-    DEBUG = args.debug
+    # Roda o solver
     
-    # Roda o solver    
     solucao = []
 
     # Se achou solucao
-    if csp_solver(n_vars, vars, n_rest, rest, solucao):
+    if csp_solver(1, n_vars, vars, n_rest, rest, solucao):
         # Se a saida for os valores das variaveis
         if args.valores:
             for i in solucao:
-                print(i['nome_var'] + " = " + str(i['valor']))   
-                # print('\n')   
+                print(i['nome_var'] + " = " + str(i['valor']))      
         # Se a saida for sat ou nao sat
         elif args.eh_sat:
             with open("tmp.out", 'w') as file:
