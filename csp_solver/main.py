@@ -57,6 +57,7 @@ def busca_mrv(lista_vars: list):
             var['escolhida'] = 1
             # print(f"depois {var['escolhida']}") 
             lista_vars[i] = var
+        
            
     return lista_vars, var_escolhida
 
@@ -70,6 +71,8 @@ def csp_solver(num_vars: int, lista_vars: list, num_restricoes: int, lista_restr
         if DEBUG:
             print(f"\nSolucao encontrada: {solucao}\n")
         return True    
+    
+    # print(f"var {dados_var['indice_var']}, {dados_var['dominio']}, {dados_var['escolhida']}")
 
     # pega indice da variavel
     indice = dados_var['indice_var']
@@ -142,6 +145,7 @@ def csp_solver(num_vars: int, lista_vars: list, num_restricoes: int, lista_restr
 
     # gera dominio valido
     dom_valido = list(valores_validos)
+    # print(f'len dom valido {len(dom_valido)}')
 
     # testa valores do dominio na solucao
     for valor in dom_valido:
@@ -154,6 +158,7 @@ def csp_solver(num_vars: int, lista_vars: list, num_restricoes: int, lista_restr
             'var': indice,
             'valor': valor
         })
+        
         if csp_solver(num_vars, lista_vars, num_restricoes, lista_restricoes, solucao):
             return True
         solucao.pop()  
