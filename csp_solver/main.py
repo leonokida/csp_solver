@@ -9,6 +9,45 @@ import argparse
 class t_restricao(Enum):
     V = 0,
     I = 1
+    
+def revisa(rest, var, lista_vars):
+    outras_vars = copy.deepcopy(rest['indices_escopo'])
+    outras_vars.remove(var)
+
+    return var['dominio']
+
+# Coloca consistência de arco nas restrições
+def ac3(num_vars: int, lista_vars: list, num_restricoes: int, lista_restricoes: list):
+    stack = []
+
+    # Empilha restrições
+    for rest in lista_restricoes:
+        for var in rest['indices_escopo']:
+            stack.append((rest, var))
+
+    while stack != []:
+
+        # Revisa restrição no topo da pilha
+        rest, var = stack.pop()
+        novo_dom = revisa(rest, var, lista_vars)
+        alteracao = False
+
+        # Aplica revisão
+        for i in lista_vars:
+            if i['indice_var'] == var and i['dominio'] != novo_dom:
+                i['dominio'] = novo_dom
+                alteracao = True
+                break
+
+        # Adiciona restrições que podem ter sido afetadas pela revisão
+        if alteracao:
+            for rest2  in lista_restricoes:
+                if var in rest2['indices_escopo'] and rest2 != rest:
+                    for var2 in rest2['indices_escopo']:
+                        if var2 != var:
+                            stack.append((rest2, var2))
+
+    return lista_vars
 
 # Recebe: indice de uma variavel e solucao parcial
 # Retorna: boolean dizendo se a variavel esta na solucao parcial
@@ -47,6 +86,9 @@ def csp_solver(indice: int, num_vars: int, lista_vars: list, num_restricoes: int
         if DEBUG:
             print(f"\nSolucao encontrada: {solucao}\n")
         return True
+    
+    # aplica consistência de arco ac-3
+    lista_vars = ac3(num_vars, lista_vars, num_restricoes, lista_restricoes)
     
     # obtem dominio da variavel
     dados_var = busca_var(indice, lista_vars)
