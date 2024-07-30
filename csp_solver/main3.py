@@ -9,89 +9,6 @@ import argparse
 class t_restricao(Enum):
     V = 0,
     I = 1
-    
-def revisa(rest, var, lista_vars):
-    dominio = busca_var(var, lista_vars)['dominio']
-    posicao_escopo = rest['indices_escopo'].index(var)
-
-    # verifica valores que não respeitam restrição
-    remover = []
-
-    # restrições do tipo válido
-    if rest['tipo_restricao'] == t_restricao.V:
-        for valor in dominio:
-            eh_valido = False
-
-            for tupla in rest["tuplas"]:
-                # se o valor estiver registrado na restrição, ele pode ser válido
-                if valor == tupla[posicao_escopo]:
-                    relacionado_invalido = False
-
-                    # se o valor estiver relacionado a um valor que não existe no domínio de outra variável, ele é inválido
-                    for posicao_outra_var, valor_outra_var in enumerate(tupla):
-                        if posicao_outra_var != posicao_escopo and not (valor_outra_var in busca_var(rest['indices_escopo'][posicao_outra_var], lista_vars)['dominio']):
-                            relacionado_invalido = True
-
-                    if not relacionado_invalido:
-                        eh_valido = True
-                        break
-
-            if not eh_valido:
-                remover.append(valor)
-
-    # restrições do tipo inválido
-    elif rest['tipo_restricao'] == t_restricao.I:
-        for valor in dominio:
-            eh_valido = True
-            # remove o valor do domínio se ele for relacionado a outra variável que só possui o valor restrito no domínio
-            for tupla in rest["tuplas"]:
-                if valor == tupla[posicao_escopo]:
-                    for posicao_outra_var, valor_outra_var in enumerate(tupla):
-                        if posicao_outra_var != posicao_escopo and [valor_outra_var] == busca_var(rest['indices_escopo'][posicao_outra_var], lista_vars)['dominio']:
-                            eh_valido = False
-                            break
-
-        if not eh_valido:
-            remover.append(valor)
-
-    # remove valores do domínio que não estão de acordo com restrição
-    for valor in remover:
-        dominio.remove(valor)
-
-    return dominio
-
-# Coloca consistência de arco nas restrições
-def ac3(num_vars: int, lista_vars: list, num_restricoes: int, lista_restricoes: list):
-    stack = []
-
-    # Empilha restrições
-    for rest in lista_restricoes:
-        for var in rest['indices_escopo']:
-            stack.append((rest, var))
-
-    while stack != []:
-
-        # Revisa restrição no topo da pilha
-        rest, var = stack.pop()
-        novo_dom = revisa(rest, var, lista_vars)
-        alteracao = False
-
-        # Aplica revisão
-        for i in lista_vars:
-            if i['indice_var'] == var and i['dominio'] != novo_dom:
-                i['dominio'] = novo_dom
-                alteracao = True
-                break
-
-        # Adiciona restrições que podem ter sido afetadas pela revisão
-        if alteracao:
-            for rest2 in lista_restricoes:
-                if var in rest2['indices_escopo'] and rest2 != rest:
-                    for var2 in rest2['indices_escopo']:
-                        if var2 != var:
-                            stack.append((rest2, var2))
-
-    return lista_vars
 
 # Recebe: indice de uma variavel e solucao parcial
 # Retorna: boolean dizendo se a variavel esta na solucao parcial
@@ -131,9 +48,6 @@ def csp_solver(indice: int, num_vars: int, lista_vars: list, num_restricoes: int
             print(f"\nSolucao encontrada: {solucao}\n")
         return True
     
-    # aplica consistência de arco ac-3
-    lista_vars = ac3(num_vars, lista_vars, num_restricoes, lista_restricoes)
-    
     # obtem dominio da variavel
     dados_var = busca_var(indice, lista_vars)
 
@@ -149,6 +63,37 @@ def csp_solver(indice: int, num_vars: int, lista_vars: list, num_restricoes: int
         if indice in rest['indices_escopo']:
 
             posicao_escopo = rest['indices_escopo'].index(indice)
+            
+            # para variavel 1
+            # if indice == 1:
+            #     if DEBUG:
+            #         print(f"Valores antigos para var {indice}: {valores_validos}")
+
+            #     novos_valores = set()
+
+            #     if len(solucao) == 0:   
+            #         for tupla in rest['tuplas']:
+
+            #             if tupla[0] == 1:
+            #                 novos_valores.add(1)
+            #             elif tupla[0] == -1: 
+            #                 novos_valores.add(0)                       
+            #     else: 
+            #         valor_na_solucao = obtem_valor_na_solucao(indice, solucao)             
+
+            #         # busca restricoes que possuem a outra variavel com o valor atual
+            #         for t in busca_rest(indice, valor_na_solucao, rest['tuplas']):
+            #             # se for restricao valida, adiciona aos novos valores                            
+            #             novos_valores.add(t[posicao_escopo])
+
+            #     if DEBUG:
+            #         print(f"Novos_valores para var {indice}: {novos_valores}")
+
+            #     # atualiza valores validos com interseccao para nao afetar valores antigos   
+            #     valores_validos = valores_validos.intersection(novos_valores)
+
+            #     if DEBUG:
+            #         print(f"Valores atualizados para var {indice}: {valores_validos}")
 
             # analisa outras variaveis
             outras_vars = copy.deepcopy(rest['indices_escopo'])
