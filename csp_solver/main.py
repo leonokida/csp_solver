@@ -123,25 +123,47 @@ def busca_var(indice: int, lista_vars: list):
     for var in lista_vars:
         if var['indice_var'] == indice:
             return var
+        
+def busca_mrv(lista_vars: list):
 
-def csp_solver(indice: int, num_vars: int, lista_vars: list, num_restricoes: int, lista_restricoes: list, solucao: list):
-    # retorna se solucao eh valida
-    if indice == num_vars + 1:
-        if DEBUG:
-            print(f"\nSolucao encontrada: {solucao}\n")
-        return True
+    menor_dominio = float('inf')
+    var_escolhida = None
+
+    for i in range(len(lista_vars)):
+        var = lista_vars[i]
+        dom = len(var['dominio'])        
+
+        if dom < menor_dominio and var['escolhida'] == 0:
+            # print(f"antes {var['escolhida']}")
+            menor_dominio = dom
+            var_escolhida = var
+            # print(f"indice var {var['indice_var']}, i{i}")
+            # var['escolhida'] = 1
+            # print(f"depois {var['escolhida']}") 
+            lista_vars[i] = var
+                   
+    return lista_vars, var_escolhida
+
+def csp_solver(num_vars: int, lista_vars: list, num_restricoes: int, lista_restricoes: list, solucao: list):
     
     # aplica consistência de arco ac-3
     lista_vars = ac3(num_vars, lista_vars, num_restricoes, lista_restricoes)
+  
+    # obtem dados da variavel
+    lista_vars, dados_var = busca_mrv(lista_vars)
     
-    # obtem dominio da variavel
-    dados_var = busca_var(indice, lista_vars)
+    # todas as variaveis ja foram escolhidas
+    if dados_var == None:
+        if DEBUG:
+            print(f"\nSolucao encontrada: {solucao}\n")
+        return True    
+    indice = dados_var['indice_var']
 
     # lista de restricoes relevantes
     valores_validos = set(copy.deepcopy(dados_var['dominio']))
 
-    # if DEBUG:
-    #     print(f"Valores válidos antes de remover inválidos para var {indice}: {valores_validos}")
+    if DEBUG:
+        print(f"Valores válidos antes de remover inválidos para var {indice}: {valores_validos}")
 
     # remove valores invalidos do dominio
     for rest in lista_restricoes:
@@ -220,7 +242,12 @@ def csp_solver(indice: int, num_vars: int, lista_vars: list, num_restricoes: int
             'var': indice,
             'valor': valor
         })
-        if csp_solver(indice + 1, num_vars, lista_vars, num_restricoes, lista_restricoes, solucao):
+
+        var = lista_vars[indice-1]
+        var['escolhida'] = 1
+        lista_vars[indice-1] = var
+
+        if csp_solver(num_vars, lista_vars, num_restricoes, lista_restricoes, solucao):
             return True
         solucao.pop()  
 
@@ -259,7 +286,8 @@ def le_entrada(nome_arq: str):
             'indice_var': i,
             'nome_var': nome_var,
             'tam_dominio': tam_dominio_var,
-            'dominio': dominio
+            'dominio': dominio,
+            'escolhida': 0
         })
     
     # obtem numero de restricoes
@@ -398,7 +426,7 @@ if __name__ == "__main__":
     solucao = []
 
     # Se achou solucao
-    if csp_solver(1, n_vars, vars, n_rest, rest, solucao):
+    if csp_solver(n_vars, vars, n_rest, rest, solucao):
         # Se a saida for os valores das variaveis
         if args.valores:
             for i in solucao:
