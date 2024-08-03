@@ -249,6 +249,8 @@ def csp_solver(num_vars: int, lista_vars: list, num_restricoes: int, lista_restr
 
         if csp_solver(num_vars, lista_vars, num_restricoes, lista_restricoes, solucao):
             return True
+        
+        var['escolhida'] = 0
         solucao.pop()  
 
     # nao possui solucao valida
@@ -402,7 +404,7 @@ if __name__ == "__main__":
     elif args.restricoes:
         nome_arquivo = arquivo_entrada.split(".")
 
-        if nome_arquivo[-1] == 'txt':
+        if True:
             # Faz a leitura das variaveis e restricoes
             n_vars, vars, n_rest, rest = le_entrada(arquivo_entrada)
         else:
