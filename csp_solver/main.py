@@ -124,6 +124,8 @@ def busca_var(indice: int, lista_vars: list):
         if var['indice_var'] == indice:
             return var
         
+# Recebe: lista de variaveis
+# Retorna: dados da variavel i na lista
 def busca_mrv(lista_vars: list):
 
     menor_dominio = float('inf')
@@ -134,15 +136,10 @@ def busca_mrv(lista_vars: list):
         dom = len(var['dominio'])        
 
         if dom < menor_dominio and var['escolhida'] == 0:
-            # print(f"antes {var['escolhida']}")
             menor_dominio = dom
             var_escolhida = var
-            # print(f"indice var {var['indice_var']}, i{i}")
-            # var['escolhida'] = 1
-            # print(f"depois {var['escolhida']}") 
-            lista_vars[i] = var
                    
-    return lista_vars, var_escolhida
+    return var_escolhida
 
 def csp_solver(num_vars: int, lista_vars: list, num_restricoes: int, lista_restricoes: list, solucao: list):
     
@@ -150,13 +147,15 @@ def csp_solver(num_vars: int, lista_vars: list, num_restricoes: int, lista_restr
     lista_vars = ac3(num_vars, lista_vars, num_restricoes, lista_restricoes)
   
     # obtem dados da variavel
-    lista_vars, dados_var = busca_mrv(lista_vars)
+    dados_var = busca_mrv(lista_vars)
     
     # todas as variaveis ja foram escolhidas
     if dados_var == None:
         if DEBUG:
             print(f"\nSolucao encontrada: {solucao}\n")
         return True    
+    
+    # pega o indice da variavel 
     indice = dados_var['indice_var']
 
     # lista de restricoes relevantes
