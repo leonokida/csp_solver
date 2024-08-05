@@ -15,6 +15,7 @@
 #include "bc.h"
 #include "wumpus-simplificado.h"
 #include "agente-wumpus.h"
+#include <time.h>
 
 // Comentários:
 // 1 - um algoritmo exponencial para SAT é chamado a cada 
@@ -26,7 +27,9 @@
 //     nunca arrisca um caminho que pode ter poço.
 
 int main() {
-  
+  clock_t t;
+
+
   Mapa *map = cria_Mapa();
 
   // Cinco cláusulas para cada regra que relaciona Brisa com Poço,
@@ -43,7 +46,13 @@ int main() {
   int tam_caminho = 0;
   Ponto p = {0,0};
   caminho[tam_caminho++] = p;
- 
-  busca(map, BC, caminho, tam_caminho);
+
+  // printf("LALALA");
+
+  t = clock();            /* get initial time */
+  // time1 = time1 / CLOCKS_PER_SEC;      /*    in seconds    */ 
+  busca(map, BC, caminho, tam_caminho, t);
+  // timedif = ( ((double) clock()) / CLOCKS_PER_SEC) - time1;
+  // printf("The elapsed time is %lf seconds\n", timedif);
 }
 

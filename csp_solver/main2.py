@@ -347,9 +347,7 @@ def le_argumentos():
     parser = argparse.ArgumentParser()
 
     parser.add_argument('-c', '--cnf', action='store_true',
-                        help="O input eh um arquivo .dimacs ou .cnf") 
-    parser.add_argument('-t', '--timer', action='store_true',
-                        help="Contar o tempo de execucao do solver")  
+                        help="O input eh um arquivo .dimacs ou .cnf")  
     parser.add_argument('-r', '--restricoes', action='store_true',
                         help="O input esta no formato de restricoes criado")  
     parser.add_argument('-s', '--eh_sat', action='store_true',
@@ -432,8 +430,7 @@ if __name__ == "__main__":
     # Roda o solver    
     solucao = []
 
-    if args.timer:
-        start = time.time()
+    start = time.time()
 
     # Se achou solucao
     if csp_solver(n_vars, vars, n_rest, rest, solucao):
@@ -461,8 +458,7 @@ if __name__ == "__main__":
         else:
             print("Erro: escreva -v ou -s para a saida", file=sys.stderr)
             sys.exit(1)
-    
-    if args.timer:
-        end = time.time()
-        total = round(end-start, 5)
-        print(f'tempo de execucao: {total}')
+
+    end = time.time()
+    total = round(end-start, 5)
+    print(f'tempo de execucao: {total}')

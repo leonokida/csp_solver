@@ -66,11 +66,11 @@ int percepcao(Ponto p, Mapa *map) {
   int percep = map->mat[p.x][p.y];
   if (percep == POCO) {
     printf("PERDEU: caiu em um buraco!\n");
-    exit(0);
+    // exit(0);
   }
   if (percep == OURO) {
     printf("GANHOU: achou o ouro!\n");
-    exit(0);
+    // exit(0);
   }
   return percep;
 }
