@@ -76,32 +76,30 @@ do código do Wumpus simplificado, localizado no diretório wumpus_sat.
 O uso é o mesmo da versão anterior,
 desde que a estrutura de pastas não seja alterada.
 
-O comando make é usado para compilar, e o make show, para compilar
-de forma que o mapa será mostrado.
-Depois, é necessário rodar o executável, colocando o mapa como entrada.
-
 Exemplo de Uso
 
-cd wumpus_sat
-make show
+cd wumpus
+make 
 ./wumpus < exemplos/teste4.in
-
 
 
 
 - ALTERAÇÕES 
 
 Foram implementadas a GAC (Consistência de Arco Genealizada) e a heurística MRV (Minimum Restraining Order). Os experimentos foram rodados em triplicata, e será apresentada a média dos tempos de execução.
-
+Serão apresentados os valores para cada instância no Trabalho 4, seguidos do tempo no Trabalho 3.
 
 
 - RESULTADOS
 
-> SAT
+> SAT (retirados do SATLIB - Benchmark Problems)
 
 uf250-1065, 250 variáveis, 1065 cláusulas: 22,432s
-sw100-8-p0-c5, 100 vértices, 400 arestas, p=0: 128,849s (2,147min)
+					T3:28,522s
 
+LRAN, Large Random-3-SAT instances, f1000: 1721,408 (28,690min)
+
+sw100-8-p0-c5, 100 vértices, 400 arestas, p=0: 128,849s (2,147min)
 
 > N-Queens
 
@@ -113,6 +111,7 @@ N = 20: 5632,366s (93,872min)
 
 teste7.in: 140,233s (2,337min)
 teste15.in: 932,446 (15,540min)
+
 
 
 
