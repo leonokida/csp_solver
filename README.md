@@ -101,7 +101,7 @@ N = 20: 5632,366s (93,872min)
 teste7.in: 140,233s (2,337min)
 teste15.in: 932,446 (15,540min)
 
-### LIMITAÇÕES
+### Limitações
 
 Para o problema SAT, algumas instâncias podem não dar o resultado correto.
 No problema N-Queens, conforme N aumenta, a velocidade não diminui, conforme esperado.
