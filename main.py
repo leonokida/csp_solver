@@ -7,6 +7,8 @@ import dimacs_translation
 import argparse
 import time
 
+sys.setrecursionlimit(2000)
+
 class t_restricao(Enum):
     V = 0,
     I = 1
