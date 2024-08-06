@@ -87,10 +87,7 @@ Serão apresentados os valores para cada instância no Trabalho 4, seguidos do t
 ### SAT (retirados do SATLIB - Benchmark Problems)
 
 uf250-1065, 250 variáveis, 1065 cláusulas: 22,432s
-					T3:28,522s
-
 LRAN, Large Random-3-SAT instances, f1000: 1721,408 (28,690min)
-
 sw100-8-p0-c5, 100 vértices, 400 arestas, p=0: 128,849s (2,147min)
 
 ### N-Queens
@@ -103,6 +100,15 @@ N = 20: 5632,366s (93,872min)
 
 teste7.in: 140,233s (2,337min)
 teste15.in: 932,446 (15,540min)
+
+### LIMITAÇÕES
+
+Para o problema SAT, algumas instâncias podem não dar o resultado correto.
+No problema N-Queens, conforme N aumenta, a velocidade não diminui, conforme esperado.
+Esses dois pontos indicam uma possível falha na implementação.
+Nos outros problemas, houve uma diminuição relativa dos tempos de execução.
+A fim de melhorar mais a velocidade de execução, além da revisão do código,
+podem ser implementadas mais otimizações, como outras estruturas de dados, paralelização, utilização da memória e mais heurísticas, como LCV.
 
 ## ESTRUTURA DO TRABALHO
 
