@@ -16,6 +16,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "agente-wumpus.h"
+#include <time.h>
 
 // insere as regras do jogo na BC.
 // É necessário saber apenas o tamanho do mapa
@@ -73,12 +74,27 @@ void popula_BaseCon(BaseCon *BC, int tam_mapa) {
 // a BC para percorrer apenas posições seguras.
 // O parâmetro 'caminho' deve conter o caminho parcial já percorrido,
 // sendo inicializado com a posição inicial (0,0).
-void busca(Mapa *map, BaseCon *BC, Ponto *caminho, int tam_caminho) {
-  
+void busca(Mapa *map, BaseCon *BC, Ponto *caminho, int tam_caminho, clock_t t) {
+  clock_t time1;
+  double taken;
+
   imprime_Mapa(map, caminho, tam_caminho);
 
   Ponto p = caminho[tam_caminho-1];
   int percep = percepcao(p, map);
+
+  if (percep == 2){
+    time1 = clock() - t;
+    taken = ((double) time1)/CLOCKS_PER_SEC;
+    printf("The elapsed time is %f seconds\n", taken);
+    exit(0);
+  }
+  if (percep == 3){
+    time1 = clock() - t;
+    taken = ((double) time1)/CLOCKS_PER_SEC;
+    printf("The elapsed time is %f seconds\n", taken);
+    exit(0);
+  }
 
   if (percep == BRISA) {
     Clausula alfa;
@@ -97,28 +113,28 @@ void busca(Mapa *map, BaseCon *BC, Ponto *caminho, int tam_caminho) {
     Ponto prox = {p.x-1, p.y};
     if (ponto_seguro(prox, caminho, tam_caminho, map->n, BC)) {
       caminho[tam_caminho] = prox;
-      busca(map, BC, caminho, tam_caminho+1);
+      busca(map, BC, caminho, tam_caminho+1, t);
     }
   }
   if (p.x < map->n-1) {
     Ponto prox = {p.x+1, p.y};
     if (ponto_seguro(prox, caminho, tam_caminho, map->n, BC)) {
       caminho[tam_caminho] = prox;
-      busca(map, BC, caminho, tam_caminho+1);
+      busca(map, BC, caminho, tam_caminho+1, t);
     }
   }
   if (p.y > 0) {
     Ponto prox = {p.x, p.y-1};
     if (ponto_seguro(prox, caminho, tam_caminho, map->n, BC)) {
       caminho[tam_caminho] = prox;
-      busca(map, BC, caminho, tam_caminho+1);
+      busca(map, BC, caminho, tam_caminho+1, t);
     }
   }
   if (p.y < map->n-1) {
     Ponto prox = {p.x, p.y+1};
     if (ponto_seguro(prox, caminho, tam_caminho, map->n, BC)) {
       caminho[tam_caminho] = prox;
-      busca(map, BC, caminho, tam_caminho+1);
+      busca(map, BC, caminho, tam_caminho+1, t);
     }
   }
 }

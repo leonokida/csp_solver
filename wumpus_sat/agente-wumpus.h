@@ -37,7 +37,7 @@ void popula_BaseCon(BaseCon *BC, int tam_mapa);
 // a BC para percorrer apenas posições seguras.
 // O parâmetro 'caminho' deve conter o caminho parcial já percorrido,
 // sendo inicializado com a posição inicial (0,0).
-void busca(Mapa *map, BaseCon *BC, Ponto *caminho, int tam_caminho);
+void busca(Mapa *map, BaseCon *BC, Ponto *caminho, int tam_caminho, clock_t t);
 
 // verifica se o ponto p já foi percorrido no caminho atual
 int pertence(Ponto p, Ponto *caminho, int tam_caminho);

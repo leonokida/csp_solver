@@ -10,15 +10,17 @@ def parse_dimacs(dimacs_file):
     clausulas = []
     
     for linha in linhas:
-        if linha.startswith('c'):
-            # Comentario
+        if linha.startswith('c') or len(linha) <= 2:
             continue
+        # elif len(linha) == 2:
+        #     print(linha)
         elif linha.startswith('p'):
             # Pega numero de variaveis e numero de clausulas
             _, _, n_vars, n_clausulas = linha.split()
             n_vars, n_clausulas = int(n_vars), int(n_clausulas)
         else:
             clausula = list(map(int, linha.strip().split()))
+            # print(clausula)
             if clausula[-1] == 0:
                 # Remove 0
                 clausula = clausula[:-1]

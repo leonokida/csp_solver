@@ -5,6 +5,7 @@ import sys
 import copy
 import dimacs_translation
 import argparse
+import time
 
 class t_restricao(Enum):
     V = 0,
@@ -341,6 +342,8 @@ if __name__ == "__main__":
     # Roda o solver
     
     solucao = []
+    # if args.timer:
+    start = time.time()
 
     # Se achou solucao
     if csp_solver(1, n_vars, vars, n_rest, rest, solucao):
@@ -367,3 +370,8 @@ if __name__ == "__main__":
         else:
             print("Erro: escreva -v ou -s para a saida", file=sys.stderr)
             sys.exit(1)
+
+
+    end = time.time()
+    total = round(end-start, 5)
+    print(f'tempo de execucao: {total}')
