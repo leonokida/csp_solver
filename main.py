@@ -7,6 +7,8 @@ import dimacs_translation
 import argparse
 import time
 
+counter = 0
+
 sys.setrecursionlimit(2000)
 
 class t_restricao(Enum):
@@ -46,6 +48,12 @@ def busca_var(indice: int, lista_vars: list):
 
 def csp_solver(indice: int, num_vars: int, lista_vars: list, num_restricoes: int, lista_restricoes: list, solucao: list):
     # retorna se solucao eh valida
+
+    global counter
+    # print(counter)
+    # print("/n")
+    counter = counter +1
+
     if indice == num_vars + 1:
         if DEBUG:
             print(f"\nSolucao encontrada: {solucao}\n")
@@ -57,8 +65,8 @@ def csp_solver(indice: int, num_vars: int, lista_vars: list, num_restricoes: int
     # lista de restricoes relevantes
     valores_validos = set(copy.deepcopy(dados_var['dominio']))
 
-    # if DEBUG:
-    #     print(f"Valores válidos antes de remover inválidos para var {indice}: {valores_validos}")
+    if DEBUG:
+        print(f"Valores válidos antes de remover inválidos para var {indice}: {valores_validos}")
 
     # remove valores invalidos do dominio
     for rest in lista_restricoes:
@@ -67,37 +75,6 @@ def csp_solver(indice: int, num_vars: int, lista_vars: list, num_restricoes: int
 
             posicao_escopo = rest['indices_escopo'].index(indice)
             
-            # para variavel 1
-            # if indice == 1:
-            #     if DEBUG:
-            #         print(f"Valores antigos para var {indice}: {valores_validos}")
-
-            #     novos_valores = set()
-
-            #     if len(solucao) == 0:   
-            #         for tupla in rest['tuplas']:
-
-            #             if tupla[0] == 1:
-            #                 novos_valores.add(1)
-            #             elif tupla[0] == -1: 
-            #                 novos_valores.add(0)                       
-            #     else: 
-            #         valor_na_solucao = obtem_valor_na_solucao(indice, solucao)             
-
-            #         # busca restricoes que possuem a outra variavel com o valor atual
-            #         for t in busca_rest(indice, valor_na_solucao, rest['tuplas']):
-            #             # se for restricao valida, adiciona aos novos valores                            
-            #             novos_valores.add(t[posicao_escopo])
-
-            #     if DEBUG:
-            #         print(f"Novos_valores para var {indice}: {novos_valores}")
-
-            #     # atualiza valores validos com interseccao para nao afetar valores antigos   
-            #     valores_validos = valores_validos.intersection(novos_valores)
-
-            #     if DEBUG:
-            #         print(f"Valores atualizados para var {indice}: {valores_validos}")
-
             # analisa outras variaveis
             outras_vars = copy.deepcopy(rest['indices_escopo'])
             outras_vars.remove(indice)         
@@ -344,7 +321,6 @@ if __name__ == "__main__":
     # Roda o solver
     
     solucao = []
-
     start = time.time()
 
     # Se achou solucao
