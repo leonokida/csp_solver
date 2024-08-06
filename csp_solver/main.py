@@ -133,6 +133,7 @@ def busca_mrv(lista_vars: list):
     menor_dominio = float('inf')
     var_escolhida = None
 
+    # checa tamanho do dominio
     for i in range(len(lista_vars)):
         var = lista_vars[i]
         dom = len(var['dominio'])        
@@ -243,7 +244,8 @@ def csp_solver(num_vars: int, lista_vars: list, num_restricoes: int, lista_restr
             'var': indice,
             'valor': valor
         })
-
+        
+        # atualiza flag de variavel escolhida
         var = lista_vars[indice-1]
         var['escolhida'] = 1
         lista_vars[indice-1] = var
@@ -251,6 +253,7 @@ def csp_solver(num_vars: int, lista_vars: list, num_restricoes: int, lista_restr
         if csp_solver(num_vars, lista_vars, num_restricoes, lista_restricoes, solucao):
             return True
         
+        # se nao der certo, a var ainda pode ser escolhida
         var['escolhida'] = 0
         solucao.pop()  
 
@@ -346,16 +349,12 @@ def le_argumentos():
     # Lida com opcoes e argumentos
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('-c', '--cnf', action='store_true',
-                        help="O input eh um arquivo .dimacs ou .cnf") 
-    parser.add_argument('-t', '--timer', action='store_true',
-                        help="Contar o tempo de execucao do solver")  
-    parser.add_argument('-r', '--restricoes', action='store_true',
-                        help="O input esta no formato de restricoes criado")  
     parser.add_argument('-s', '--eh_sat', action='store_true',
                         help="O output dira se eh sat ou nao")  
     parser.add_argument('-v', '--valores', action='store_true',
                         help="O output sera os valores encontrados para as variaveis")  
+    parser.add_argument('-t', '--timer', action='store_true',
+                        help="Contar o tempo de execucao do solver")  
     parser.add_argument('-d', '--debug', action='store_true',
                     help="Coloca prints de debug")  
     parser.add_argument('filename')  
@@ -368,49 +367,35 @@ def le_argumentos():
 
     # Checa entrada
     arquivo_entrada = args.filename
+    nome_arquivo = arquivo_entrada.split(".")
 
-    # Se ha duas flags de entrada
-    if args.restricoes and args.cnf:
-        print("Erro: Inclua somente uma flag de entrada, -c ou -r", file=sys.stderr)
-        sys.exit(1)
     # Se ha duas flags de saida
-    elif args.valores and args.eh_sat:
+    if args.valores and args.eh_sat:
         print("Erro: Inclua somente uma flag de saida, -s ou -v", file=sys.stderr)
         sys.exit(1)
+
     # Se nao ha flag de saida
-    elif not args.valores and not args.eh_sat:
+    if not args.valores and not args.eh_sat:
         print("Erro: Inclua uma flag de saida, -s ou -v", file=sys.stderr)
         sys.exit(1)
-    # Se nao ha flag de entrada
-    elif not args.restricoes and not args.cnf:
-        print("Erro: Inclua uma flag de entrada, -c ou -r", file=sys.stderr)
-        sys.exit(1)
-    # Se arquivo for .DIMACS ou .cnf
-    elif args.cnf:
-        nome_arquivo = arquivo_entrada.split(".")
 
-        if nome_arquivo[-1] == 'dimacs' or nome_arquivo[-1] == 'cnf':
-            # Converte para o formato de restricoes
-            saida_traducao = 'tmp.out'
-            dimacs_translation.traduz_dimacs(arquivo_entrada, saida_traducao)
+    # Se arquivo for .DIMACS ou .cnf  
+    if nome_arquivo[-1] == 'dimacs' or nome_arquivo[-1] == 'cnf':
 
-            # Faz a leitura das variaveis e restricoes
-            n_vars, vars, n_rest, rest = le_entrada(saida_traducao)
-        
-        else:
-            print("Erro: a flag -c deve vir com um arquivo .cnf ou .DIMACS", file=sys.stderr)
-            sys.exit(1)
+        # Converte para o formato de restricoes
+        saida_traducao = 'tmp.out'
+        dimacs_translation.traduz_dimacs(arquivo_entrada, saida_traducao)
 
-    # Se o arquivo for restricoes, faz a leitura
-    elif args.restricoes:
-        nome_arquivo = arquivo_entrada.split(".")
+        # Faz a leitura das variaveis e restricoes
+        n_vars, vars, n_rest, rest = le_entrada(saida_traducao)   
 
-        # if nome_arquivo[-1] == 'txt':
-            # Faz a leitura das variaveis e restricoes
+    # Se o arquivo for restricoes
+    elif nome_arquivo[-1] == 'txt' or nome_arquivo[-1] == 'in':
+        # Faz a leitura das variaveis e restricoes
         n_vars, vars, n_rest, rest = le_entrada(arquivo_entrada)
-        # else:
-        #     print("Erro: a flag -r deve vir com um arquivo .txt", file=sys.stderr)
-        #     sys.exit(1)
+    else:
+        print("Erro: forneça um arquivo de texto, ", file=sys.stderr)
+        sys.exit(1)
 
     if DEBUG:
         print(f"Variaveis:")

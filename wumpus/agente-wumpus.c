@@ -74,7 +74,7 @@ void popula_BaseCon(BaseCon *BC, int tam_mapa) {
 // O parâmetro 'caminho' deve conter o caminho parcial já percorrido,
 // sendo inicializado com a posição inicial (0,0).
 void busca(Mapa *map, BaseCon *BC, Ponto *caminho, int tam_caminho, clock_t t) {
-  // printf("%ld\n", t);
+
   clock_t time1;
   double taken;
 
@@ -84,14 +84,12 @@ void busca(Mapa *map, BaseCon *BC, Ponto *caminho, int tam_caminho, clock_t t) {
   int percep = percepcao(p, map);
 
   if (percep == 2){
-    printf("perdeu!\n");
     time1 = clock() - t;
     taken = ((double) time1)/CLOCKS_PER_SEC;
     printf("The elapsed time is %f seconds\n", taken);
     exit(0);
   }
   if (percep == 3){
-    printf("ganhou!\n");
     time1 = clock() - t;
     taken = ((double) time1)/CLOCKS_PER_SEC;
     printf("The elapsed time is %f seconds\n", taken);
@@ -138,8 +136,7 @@ void busca(Mapa *map, BaseCon *BC, Ponto *caminho, int tam_caminho, clock_t t) {
       caminho[tam_caminho] = prox;
       busca(map, BC, caminho, tam_caminho+1, t);
     }
-  }
-  
+  }  
 }
 
 // verifica se o ponto p já foi percorrido no caminho atual

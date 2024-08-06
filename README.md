@@ -18,7 +18,7 @@ Ele aceita arquivos de entrada tanto no formato DIMACS
 quanto no formato de restrições criado.
 Além disso, permite especificar o tipo de saída desejada.
 
-usage: main.py [-h] [-c] [-r] [-s] [-v] [-d] filename
+usage: main.py [-h] [-s] [-v] [-t] [-d] filename
 
 Argumentos Posicionais
 
@@ -26,9 +26,7 @@ Argumentos Posicionais
 
 Flags
 
-    -h, --help: Mostra a mensagem de ajuda.
-    -c, --cnf: Indica que o input é um arquivo .dimacs ou .cnf.
-    -r, --restricoes: Indica que o input está no formato de restrições criado.
+    -h, --help: Mostra a mensagem de ajuda.   
     -s, --eh_sat: O output indicará se o problema é satisfatível ou não (SAT ou UNSAT).
     -v, --valores: O output será os valores encontrados para as variáveis.
     -t, --timer: Contar o tempo de execucao do solver
@@ -41,13 +39,8 @@ Regras de Uso
 
 Exemplos de Uso
 
-Para devolver os valores do problema especificado em um arquivo no formato de restrições:
-
-    python main.py -r -v star_wars.txt
-
-Para devolver os valores das variáveis de um problema especificado em um arquivo DIMACS:
-
-    python main.py -c -v exemplo.dimacs
+    python main.py -v star_wars.txt
+    python main.py -v exemplo.dimacs
 
 
 
@@ -106,19 +99,20 @@ Foram implementadas a GAC (Consistência de Arco Genealizada) e a heurística MR
 
 > SAT
 
-250 variáveis, 1065 clauses: 22,732s
-100 variables, 449 clauses, backbone size 90: 1,814s
+uf250-1065, 250 variáveis, 1065 cláusulas: 22,432s
+sw100-8-p0-c5, 100 vértices, 400 arestas, p=0: 128,849s (2,147min)
+
 
 > N-Queens
 
-N = 16: 92,021s
-N = 24:
-N = 32: mais de 2h
+N = 16: 92,021s (1,533min)
+N = 18: 724,208s (12,070min)
+N = 20: 5632,366s (93,872min)
 
 > Wumpus
 
-teste7.in: 140,233s 
-teste15-dificil.in: 
+teste7.in: 140,233s (2,337min)
+teste15.in: 932,446 (15,540min)
 
 
 

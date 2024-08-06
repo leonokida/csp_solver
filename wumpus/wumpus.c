@@ -29,7 +29,6 @@
 int main() {
   clock_t t;
 
-
   Mapa *map = cria_Mapa();
 
   // Cinco cláusulas para cada regra que relaciona Brisa com Poço,
@@ -47,12 +46,9 @@ int main() {
   Ponto p = {0,0};
   caminho[tam_caminho++] = p;
 
-  // printf("LALALA");
-
   t = clock();            /* get initial time */
-  // time1 = time1 / CLOCKS_PER_SEC;      /*    in seconds    */ 
+ 
   busca(map, BC, caminho, tam_caminho, t);
-  // timedif = ( ((double) clock()) / CLOCKS_PER_SEC) - time1;
-  // printf("The elapsed time is %lf seconds\n", timedif);
+
 }
 
