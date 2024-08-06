@@ -87,26 +87,39 @@ Serão apresentados os valores para cada instância no Trabalho 4, seguidos do t
 ### SAT (retirados do SATLIB - Benchmark Problems)
 
     uf250-1065, 250 variáveis, 1065 cláusulas: 22,432s
-    LRAN, Large Random-3-SAT instances, f1000: 1721,408 (28,690min)
-    sw100-8-p0-c5, 100 vértices, 400 arestas, p=0: 128,849s (2,147min)
+    					   T3: 48,320s
+
+    LRAN, Large Random-3-SAT instances: 1721,410s (28,690min)
+				    T3: 2251,472s
 
 ### N-Queens
 
     N = 16: 92,021s (1,533min)
-    N = 18: 724,208s (12,070min)
-    N = 20: 5632,366s (93,872min)
+        T3: 6,242s
+
+    N = 18: 724,210s (12,070min)
+	T3: 11,230s
+
+    N = 20: 5632,370s (93,872min)
+	T3: 62,400s
 
 ### Wumpus
 
     teste7.in: 140,233s (2,337min)
+	   T3: mais de 2h
+
     teste15.in: 932,446 (15,540min)
+	    T3: mais de 3h
 
 ### Limitações
 
 Para o problema SAT, algumas instâncias podem não dar o resultado correto.
-No problema N-Queens, conforme N aumenta, a velocidade não diminui, conforme esperado.
+No problema N-Queens, a velocidade aumentou com o N, diferente do esperado.
+
 Esses dois pontos indicam uma possível falha na implementação.
+
 Nos outros problemas, houve uma diminuição relativa dos tempos de execução.
+
 A fim de melhorar mais a velocidade de execução, além da revisão do código,
 podem ser implementadas mais otimizações. Entre elas: estruturas de dados diferentes, paralelização, utilização da memória e outras heurísticas, como LCV.
 
@@ -120,10 +133,8 @@ CSP_Solver/
 │   ├── main.py
 │   └── dimacs_translation.py
 ├── wumpus/
-│   ├── bc.h
-│   ├── bc.c
-│   └── ...
-├── nqueens/
-└── sat/
+    ├── bc.h
+    ├── bc.c
+    └── ...
 
 ```
