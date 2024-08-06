@@ -106,15 +106,18 @@ teste15.in: 932,446 (15,540min)
 
 ## ESTRUTURA DO TRABALHO
 
-> CSP_Solver/
-> │
-> ├── LEIAME.txt
-> ├── csp_solver/
-> │   ├── main.py
-> │   └── dimacs_translation.py
-> ├── wumpus/
-> │   ├── bc.h
-> │   ├── bc.c
-> │   └── ...
-> ├── nqueens/
-> └── sat/
+```
+CSP_Solver/
+│
+├── LEIAME.txt
+├── csp_solver/
+│   ├── main.py
+│   └── dimacs_translation.py
+├── wumpus/
+│   ├── bc.h
+│   ├── bc.c
+│   └── ...
+├── nqueens/
+└── sat/
+
+```
