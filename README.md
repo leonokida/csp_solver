@@ -108,7 +108,7 @@ No problema N-Queens, conforme N aumenta, a velocidade não diminui, conforme es
 Esses dois pontos indicam uma possível falha na implementação.
 Nos outros problemas, houve uma diminuição relativa dos tempos de execução.
 A fim de melhorar mais a velocidade de execução, além da revisão do código,
-podem ser implementadas mais otimizações, como outras estruturas de dados, paralelização, utilização da memória e mais heurísticas, como LCV.
+podem ser implementadas mais otimizações. Entre elas: estruturas de dados diferentes, paralelização, utilização da memória e outras heurísticas, como LCV.
 
 ## ESTRUTURA DO TRABALHO
 
