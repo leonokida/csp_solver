@@ -7,6 +7,8 @@ import dimacs_translation
 import argparse
 import time
 
+sys.setrecursionlimit(2000)
+
 class t_restricao(Enum):
     V = 0,
     I = 1
@@ -342,7 +344,7 @@ if __name__ == "__main__":
     # Roda o solver
     
     solucao = []
-    # if args.timer:
+
     start = time.time()
 
     # Se achou solucao
@@ -370,8 +372,6 @@ if __name__ == "__main__":
         else:
             print("Erro: escreva -v ou -s para a saida", file=sys.stderr)
             sys.exit(1)
-
-
     end = time.time()
     total = round(end-start, 5)
     print(f'tempo de execucao: {total}')
