@@ -67,7 +67,7 @@ Para converter um arquivo DIMACS para o formato de restrições:
 ## INTEGRACAO COM WUMPUS
 
 O main.py foi integrado como SAT_SOLVER nos arquivos bc.h e bc.c
-do código do Wumpus simplificado, localizado no diretório wumpus_sat.
+do código do Wumpus, localizado no diretório wumpus.
 O uso é o mesmo da versão anterior,
 desde que a estrutura de pastas não seja alterada.
 
@@ -132,7 +132,7 @@ CSP_Solver/
 ├── csp_solver/
 │   ├── main.py
 │   └── dimacs_translation.py
-├── wumpus/
+└── wumpus/
     ├── bc.h
     ├── bc.c
     └── ...
