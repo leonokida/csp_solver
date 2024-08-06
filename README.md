@@ -73,9 +73,9 @@ desde que a estrutura de pastas não seja alterada.
 
 ### Exemplo de Uso
 
-cd wumpus
-make 
-./wumpus < exemplos/teste4.in
+    cd wumpus
+    make 
+    ./wumpus < exemplos/teste4.in
 
 ## OTIMIZAÇÃO
 
@@ -86,20 +86,20 @@ Serão apresentados os valores para cada instância no Trabalho 4, seguidos do t
 
 ### SAT (retirados do SATLIB - Benchmark Problems)
 
-uf250-1065, 250 variáveis, 1065 cláusulas: 22,432s
-LRAN, Large Random-3-SAT instances, f1000: 1721,408 (28,690min)
-sw100-8-p0-c5, 100 vértices, 400 arestas, p=0: 128,849s (2,147min)
+    uf250-1065, 250 variáveis, 1065 cláusulas: 22,432s
+    LRAN, Large Random-3-SAT instances, f1000: 1721,408 (28,690min)
+    sw100-8-p0-c5, 100 vértices, 400 arestas, p=0: 128,849s (2,147min)
 
 ### N-Queens
 
-N = 16: 92,021s (1,533min)
-N = 18: 724,208s (12,070min)
-N = 20: 5632,366s (93,872min)
+    N = 16: 92,021s (1,533min)
+    N = 18: 724,208s (12,070min)
+    N = 20: 5632,366s (93,872min)
 
 ### Wumpus
 
-teste7.in: 140,233s (2,337min)
-teste15.in: 932,446 (15,540min)
+    teste7.in: 140,233s (2,337min)
+    teste15.in: 932,446 (15,540min)
 
 ### Limitações
 
